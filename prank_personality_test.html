@@ -1,0 +1,195 @@
+
+<div style="max-width: 480px; margin: 0 auto; padding: 1rem; font-family: var(--font-sans);">
+
+  <div id="screen-intro" style="text-align: center; padding: 2rem 1rem;">
+    <div style="font-size: 48px; margin-bottom: 1rem;">🧠</div>
+    <h1 style="font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 0.5rem;">深度性格测评</h1>
+    <p style="font-size: 14px; color: var(--color-text-secondary); margin: 0 0 0.5rem;">来自斯坦福行为研究院</p>
+    <p style="font-size: 13px; color: var(--color-text-tertiary); margin: 0 0 2rem;">本测评共10道题，约需3分钟<br>基于MBTI & 荣格心理学模型</p>
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1rem; margin-bottom: 1.5rem; text-align: left; font-size: 13px; color: var(--color-text-secondary); line-height: 1.6;">
+      🔒 数据安全加密传输<br>
+      📊 已有 <strong>2,847,391</strong> 人完成测评<br>
+      ⭐ 准确率高达 <strong>94.7%</strong>
+    </div>
+    <button onclick="startTest()" style="width: 100%; padding: 14px; background: #7F77DD; color: white; border: none; border-radius: var(--border-radius-lg); font-size: 16px; font-weight: 500; cursor: pointer;">开始测评</button>
+  </div>
+
+  <div id="screen-question" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <span id="q-counter" style="font-size: 13px; color: var(--color-text-secondary);">第 1 / 10 题</span>
+      <span id="q-progress-text" style="font-size: 13px; color: var(--color-text-secondary);">10%</span>
+    </div>
+    <div style="height: 4px; background: var(--color-background-secondary); border-radius: 2px; margin-bottom: 1.5rem;">
+      <div id="progress-bar" style="height: 4px; background: #7F77DD; border-radius: 2px; width: 10%; transition: width 0.3s;"></div>
+    </div>
+
+    <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; margin-bottom: 1.25rem; min-height: 100px;">
+      <p id="q-text" style="font-size: 16px; color: var(--color-text-primary); line-height: 1.6; margin: 0;"></p>
+    </div>
+
+    <div id="q-options" style="display: flex; flex-direction: column; gap: 10px;"></div>
+  </div>
+
+  <div id="screen-loading" style="display: none; text-align: center; padding: 3rem 1rem;">
+    <div style="font-size: 40px; margin-bottom: 1rem;" id="loading-icon">🔍</div>
+    <h2 style="font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 0.5rem;" id="loading-title">正在分析中...</h2>
+    <p style="font-size: 13px; color: var(--color-text-secondary);" id="loading-sub">正在构建你的神经行为模型</p>
+    <div style="margin: 2rem auto; width: 60px; height: 60px; position: relative;">
+      <div id="spinner" style="width: 60px; height: 60px; border: 3px solid var(--color-background-secondary); border-top-color: #7F77DD; border-radius: 50; animation: spin 1s linear infinite;"></div>
+    </div>
+    <div id="loading-steps" style="text-align: left; margin-top: 1rem; font-size: 12px; color: var(--color-text-secondary); line-height: 2;"></div>
+  </div>
+
+  <div id="screen-result" style="display: none; text-align: center; padding: 1rem;">
+    <h2 style="font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 0.25rem;">测评结果揭晓</h2>
+    <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 1rem;">根据你的回答，系统判定你的性格为——</p>
+    <div style="border-radius: var(--border-radius-lg); overflow: hidden; margin-bottom: 1rem; border: 0.5px solid var(--color-border-tertiary);">
+      <img id="result-img" src="" alt="result" style="width: 100%; display: block;" />
+    </div>
+    <p style="font-size: 13px; color: var(--color-text-tertiary);">测评结果仅供娱乐，请勿当真 😜</p>
+    <button onclick="restartTest()" style="margin-top: 1rem; width: 100%; padding: 12px; background: transparent; color: var(--color-text-secondary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); font-size: 14px; cursor: pointer;">再测一次</button>
+  </div>
+</div>
+
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+#spinner { border-radius: 50%; }
+.opt-btn {
+  width: 100%;
+  text-align: left;
+  padding: 12px 16px;
+  background: var(--color-background-primary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  font-size: 14px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  line-height: 1.5;
+  transition: background 0.15s, border-color 0.15s;
+}
+.opt-btn:hover { background: var(--color-background-secondary); border-color: var(--color-border-secondary); }
+</style>
+
+<script>
+const questions = [
+  {
+    q: "你独自一人在深夜，突然听到楼上传来奇怪的声音，你会……",
+    opts: ["立刻拿起拖鞋准备迎战", "假装没听见，继续刷手机", "躲进被子里，假装自己不存在", "冲上去大喊「鬼呀，你好啊！」"]
+  },
+  {
+    q: "如果你的人生是一道菜，你觉得你最像……",
+    opts: ["老干妈拌饭（百搭，实用，朴实）", "榴莲（爱的人狂爱，不爱的绕道走）", "泡面（快、便宜、人生赢家）", "白开水（无色无味，但你离不开我）"]
+  },
+  {
+    q: "朋友问你「今天吃什么」，你的第一反应是……",
+    opts: ["「随便」（但随便不行）", "立刻发一个30道菜的菜单", "「你决定」（但你决定也不行）", "直接挂电话，发一个地址"]
+  },
+  {
+    q: "你认为自己在朋友群里扮演什么角色？",
+    opts: ["永远在发表情包的那个", "负责接话尬到无话可接的那个", "从来不说话，但必须在场的那个", "莫名其妙成为核心的那个"]
+  },
+  {
+    q: "你设的闹钟一般是几点？",
+    opts: ["6:00（一个正经人）", "7:30、7:35、7:40……设了12个（谢谢）", "从来不设（凭感觉活着）", "设了又删，删了又设，最终迟到"]
+  },
+  {
+    q: "你觉得自己最大的优点是什么？",
+    opts: ["话少，但说出来都是废话", "脸皮厚，百折不挠", "没有优点，但非常清楚这一点", "优点太多，说不完，先占个坑"]
+  },
+  {
+    q: "在一场KTV，你会……",
+    opts: ["抢麦，且只唱高音部分", "坐角落看手机，偶尔鼓掌", "点了歌自己不唱，看别人唱", "唱跑调但精神状态非常好"]
+  },
+  {
+    q: "面对一个你不想参加的饭局，你会……",
+    opts: ["「我最近身体不太好……」", "直接「不去」，简洁明了", "去了，但全程一言不发", "去了，吃完就走，完美收场"]
+  },
+  {
+    q: "你睡前最常干的事是什么？",
+    opts: ["刷视频刷到天亮", "开始反思今天说错的每一句话", "规划明天，然后明天一件没做", "什么都没干，就是睡不着"]
+  },
+  {
+    q: "最后一题：如果用一种动物来形容你，你觉得自己是……",
+    opts: ["🦁 狮子（霸气，我说了算）", "🐨 考拉（吃了睡，睡了吃）", "🦊 狐狸（聪明，但懒得用）", "🐟 鱼（不知道在想什么，可能也没在想）"]
+  }
+];
+
+const PRANK_IMAGE_URL = "./1.png";
+
+let current = 0;
+
+function startTest() {
+  document.getElementById("screen-intro").style.display = "none";
+  document.getElementById("screen-question").style.display = "block";
+  showQuestion(0);
+}
+
+function showQuestion(i) {
+  current = i;
+  const pct = Math.round((i + 1) / questions.length * 100);
+  document.getElementById("q-counter").textContent = `第 ${i+1} / ${questions.length} 题`;
+  document.getElementById("q-progress-text").textContent = pct + "%";
+  document.getElementById("progress-bar").style.width = pct + "%";
+  document.getElementById("q-text").textContent = questions[i].q;
+  const cont = document.getElementById("q-options");
+  cont.innerHTML = "";
+  questions[i].opts.forEach((o, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "opt-btn";
+    btn.textContent = o;
+    btn.onclick = () => nextQuestion();
+    cont.appendChild(btn);
+  });
+}
+
+function nextQuestion() {
+  if (current < questions.length - 1) {
+    showQuestion(current + 1);
+  } else {
+    showLoading();
+  }
+}
+
+function showLoading() {
+  document.getElementById("screen-question").style.display = "none";
+  document.getElementById("screen-loading").style.display = "block";
+  const steps = [
+    "✅ 收集行为特征数据...",
+    "✅ 匹配荣格原型矩阵...",
+    "✅ 分析潜意识倾向...",
+    "✅ 计算 MBTI 维度权重...",
+    "✅ 生成专属性格报告...",
+    "🔒 加密传输中..."
+  ];
+  const container = document.getElementById("loading-steps");
+  let i = 0;
+  const titles = ["正在分析你的回答...", "构建神经行为模型...", "匹配数据库...", "即将揭晓结果！"];
+  let t = 0;
+  const titleEl = document.getElementById("loading-title");
+  const interval = setInterval(() => {
+    if (i < steps.length) {
+      container.innerHTML += steps[i] + "<br>";
+      i++;
+    }
+    if (t < titles.length) {
+      titleEl.textContent = titles[Math.min(t, titles.length-1)];
+      t++;
+    }
+    if (i >= steps.length) {
+      clearInterval(interval);
+      setTimeout(showResult, 800);
+    }
+  }, 500);
+}
+
+function showResult() {
+  document.getElementById("screen-loading").style.display = "none";
+  document.getElementById("screen-result").style.display = "block";
+  document.getElementById("result-img").src = PRANK_IMAGE_URL;
+}
+
+function restartTest() {
+  document.getElementById("screen-result").style.display = "none";
+  document.getElementById("screen-intro").style.display = "block";
+}
+</script>
